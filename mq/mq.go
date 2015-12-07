@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"sync"
 
-	//"github.com/asiainfoLDP/datahub_subscriptions/log"
+	//"github.com/asiainfoLDP/datahub_commons/log"
 
 	"github.com/Shopify/sarama"
 	//"github.com/wvanbergen/kafka/consumergroup"

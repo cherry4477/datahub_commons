@@ -6,7 +6,7 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/asiainfoLDP/datahub_subscriptions/log"
+	"github.com/asiainfoLDP/datahub_commons/log"
 )
 
 // please make sure consumeTopic is unique and only used in current app instance

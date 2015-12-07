@@ -10,7 +10,7 @@ import (
 	"strconv"
 	"strings"
 
-	//"github.com/asiainfoLDP/datahub_subscriptions/log"
+	//"github.com/asiainfoLDP/datahub_commons/log"
 )
 
 const mqp_VOID_MESSAGE_TOPIC = "-"
