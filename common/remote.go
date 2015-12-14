@@ -1,12 +1,10 @@
 package common
 
 import (
-	"encoding/json"
-	"errors"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"time"
+	"bytes"
 )
 
 const (
@@ -17,8 +15,14 @@ const (
 //
 //=============================================================
 
-func RemoteCall(method string, url string, token string) (*http.Response, []byte, error) {
-	request, err := http.NewRequest(method, url, nil)
+func RemoteCallWithBody(method string, url string, token string, body []byte) (*http.Response, []byte, error) {
+	var request *http.Request
+	var err error
+	if len(body) == 0 {
+		request, err = http.NewRequest(method, url, nil)
+	} else {
+		request, err = http.NewRequest(method, url, bytes.NewReader(body))
+	}
 	if err != nil {
 		return nil, nil, err
 	}
@@ -40,21 +44,8 @@ func RemoteCall(method string, url string, token string) (*http.Response, []byte
 	return response, bytes, err
 }
 
-func ParseJsonToMap(jsonByes []byte) (map[string]interface{}, error) {
-	if jsonByes == nil {
-		return nil, errors.New("jsonBytes can't be nil")
-	}
-	var v interface{}
-	err := json.Unmarshal(jsonByes, &v)
-	if err != nil {
-		return nil, err
-	}
-	json_map, ok := v.(map[string]interface{})
-	if !ok {
-		return nil, errors.New("parse json error")
-	}
-
-	return json_map, nil
+func RemoteCall(method string, url string, token string) (*http.Response, []byte, error) {
+	return RemoteCallWithBody(method, url, token, nil)
 }
 
 func GetRequestData(r *http.Request) ([]byte, error) {
@@ -76,17 +67,6 @@ func ParseRequestJsonAsMap(r *http.Request) (map[string]interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	var v interface{}
-	err = json.Unmarshal(data, &v)
-	if err != nil {
-		return nil, err
-	}
-
-	m, ok := v.(map[string]interface{})
-	if ok {
-		return m, nil
-	}
-
-	return nil, fmt.Errorf("can't convert request.body to a map: %s.", string(data))
+	
+	return ParseJsonToMap(data)
 }

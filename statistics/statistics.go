@@ -116,3 +116,24 @@ func RetrieveStat(db *sql.DB, key string) (int, error) {
 		return stat, nil
 	}
 }
+
+func RemoveStat(db *sql.DB, key string) (int, error) {
+	num, err := RetrieveStat(db, key)
+	if err != nil {
+		return 0, err
+	}
+	if num == 0 {
+		return 0, nil
+	}
+	
+	sqlstr := `delete from DH_ITEM_STAT where STAT_KEY=?`
+	_, err = db.Exec(sqlstr, key)
+	switch {
+	case err == sql.ErrNoRows:
+		return 0, nil
+	case err != nil:
+		return 0, err
+	default:
+		return num, nil
+	}
+}

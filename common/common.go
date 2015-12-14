@@ -4,16 +4,19 @@ import (
 	"regexp"
 	"strings"
 	"unicode/utf8"
+	"errors"
+	"encoding/json"
+	"fmt"
 )
 
 var (
 	UrlWordValidator        = regexp.MustCompile("[^a-zA-Z0-9_\\-]")
-	UnicodeUrlWordValidator = regexp.MustCompile("[\\s]")
+	UnicodeUrlWordValidator = regexp.MustCompile("[\\s]") // no spaces to avoid sql injection
 	EmailValidator          = regexp.MustCompile("[^a-zA-Z0-9_\\-\\.\\@]")
 )
 
 func init() {
-
+	
 }
 
 func ValidateGeneralWord(word string) (string, bool) {
@@ -63,3 +66,23 @@ func ValidateEmail(word string) (string, bool) {
 	}
 	return word, EmailValidator.FindString(word) == ""
 }
+
+func ParseJsonToMap(jsonByes []byte) (map[string]interface{}, error) {
+	if jsonByes == nil {
+		return nil, errors.New("jsonBytes can't be nil")
+	}
+
+	var v interface{}
+	err := json.Unmarshal(jsonByes, &v)
+	if err != nil {
+		return nil, err
+	}
+
+	m, ok := v.(map[string]interface{})
+	if ok {
+		return m, nil
+	}
+
+	return nil, fmt.Errorf("can't convert bytes to a map: %s.", string(jsonByes))
+}
+
