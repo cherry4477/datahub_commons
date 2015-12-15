@@ -5,7 +5,14 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 )
+
+/*
+The fact of arbitrary chars in tag may be a problem for stat key.
+This may make some tag stat keys are duplicated with some user stat key.
+So it is best to avoid $#& in tag name.
+*/
 
 func GetGeneralStatKey(words ...string) string {
 	return strings.Join(words, "/")
@@ -28,12 +35,13 @@ func GetCommentsStatKey(words ...string) string {
 }
 
 // item doesn't mean data item. It means any objects.
+
 func GetUserItemStatKey(username string, itemStatKey string) string {
 	return fmt.Sprintf("%s$%s", username, itemStatKey)
 }
 
 // user stats
-
+/*
 func GetUserSubscriptionsStatKey(username string) string {
 	return fmt.Sprintf("%s$#%s", username, "subs")
 }
@@ -48,6 +56,14 @@ func GetUserStarsStatKey(username string) string {
 
 func GetUserCommentsStatKey(username string) string {
 	return fmt.Sprintf("%s$#%s", username, "cmts")
+}
+*/
+
+func GetDateSubscriptionsStatKey(date time.Time) string {
+	return fmt.Sprintf("%s>%s", date.Format("2006-01-02"), "subs")
+}
+func GetDateTransactionsStatKey(date time.Time) string {
+	return fmt.Sprintf("%s>%s", date.Format("2006-01-02"), "txns")
 }
 
 //==========================================================
