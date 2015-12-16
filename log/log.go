@@ -85,70 +85,70 @@ func (logger *Logger) Debug(v ...interface{}) {
 	if logger.level > LevelDebug {
 		return
 	}
-	log.Print(now("DEBUG"), caller(logger.name, 2), fmt.Sprint(v...))
+	log.Print(now("DEBUG", logger.name, 2), fmt.Sprint(v...))
 }
 
 func (logger *Logger) Debugf(format string, v ...interface{}) {
 	if logger.level > LevelDebug {
 		return
 	}
-	log.Print(now("DEBUG"), caller(logger.name, 2), fmt.Sprintf(format, v...))
+	log.Print(now("DEBUG", logger.name, 2), fmt.Sprintf(format, v...))
 }
 
 func (logger *Logger) Info(v ...interface{}) {
 	if logger.level > LevelInfo {
 		return
 	}
-	log.Print(now("INFO"), caller(logger.name, 2), fmt.Sprint(v...))
+	log.Print(now("INFO", logger.name, 2), fmt.Sprint(v...))
 }
 
 func (logger *Logger) Infof(format string, v ...interface{}) {
 	if logger.level > LevelInfo {
 		return
 	}
-	log.Print(now("INFO"), caller(logger.name, 2), fmt.Sprintf(format, v...))
+	log.Print(now("INFO", logger.name, 2), fmt.Sprintf(format, v...))
 }
 
 func (logger *Logger) Warning(v ...interface{}) {
 	if logger.level > LevelWarning {
 		return
 	}
-	log.Print(now("WARNING"), caller(logger.name, 2), fmt.Sprint(v...))
+	log.Print(now("WARNING", logger.name, 2), fmt.Sprint(v...))
 }
 
 func (logger *Logger) Warningf(format string, v ...interface{}) {
 	if logger.level > LevelWarning {
 		return
 	}
-	log.Print(now("WARNING"), caller(logger.name, 2), fmt.Sprintf(format, v...))
+	log.Print(now("WARNING", logger.name, 2), fmt.Sprintf(format, v...))
 }
 
 func (logger *Logger) Error(v ...interface{}) {
 	if logger.level > LevelError {
 		return
 	}
-	log.Print(now("ERROR"), caller(logger.name, 2), fmt.Sprint(v...))
+	log.Print(now("ERROR", logger.name, 2), fmt.Sprint(v...))
 }
 
 func (logger *Logger) Errorf(format string, v ...interface{}) {
 	if logger.level > LevelError {
 		return
 	}
-	log.Print(now("ERROR"), caller(logger.name, 2), fmt.Sprintf(format, v...))
+	log.Print(now("ERROR", logger.name, 2), fmt.Sprintf(format, v...))
 }
 
 func (logger *Logger) Fatal(v ...interface{}) {
 	if logger.level > LevelFatal {
 		return
 	}
-	log.Fatal(now("FATAL"), caller(logger.name, 2), fmt.Sprint(v...))
+	log.Fatal(now("FATAL", logger.name, 2), fmt.Sprint(v...))
 }
 
 func (logger *Logger) Fatalf(format string, v ...interface{}) {
 	if logger.level > LevelFatal {
 		return
 	}
-	log.Fatal(now("FATAL"), caller(logger.name, 2), fmt.Sprintf(format, v...))
+	log.Fatal(now("FATAL", logger.name, 2), fmt.Sprintf(format, v...))
 }
 
 //======================================
@@ -195,8 +195,29 @@ func Fatalf(format string, v ...interface{}) {
 */
 //=====================================
 
-func now(level string) string {
-	return fmt.Sprintf("[%s][%s]", time.Now().Format("2006-01-02 15:04:05"), level)
+func now(level string, logName string, depth int) string {
+	nowstr := time.Now().Format("2006-01-02 15:04:05")
+	pc, file, line, ok := runtime.Caller(depth)
+	if ok {
+		index := strings.LastIndexByte(file, '/')
+		if index >= 0 {
+			file = file[index+1:]
+		}
+		funcname := runtime.FuncForPC(pc).Name()
+		index = strings.LastIndexByte(funcname, '.')
+		if index >= 0 {
+			funcname = funcname[index+1:]
+		} else {
+			index := strings.LastIndexByte(funcname, '/')
+			if index >= 0 {
+				funcname = funcname[index+1:]
+			}
+		}
+		return fmt.Sprintf("[%s][%s][%s][%s:%d %s] ", nowstr, logName, level, file, line, funcname)
+	}
+	
+	
+	return fmt.Sprintf("[%s][%s][%s]", nowstr, logName, level)
 }
 
 func caller(logName string, depth int) string {

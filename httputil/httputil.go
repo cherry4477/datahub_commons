@@ -68,7 +68,7 @@ func (tw *timeoutWriter) Header() http.Header {
 func (tw *timeoutWriter) Write(p []byte) (int, error) {
 	tw.mu.Lock()
 	defer tw.mu.Unlock()
-	tw.wroteHeader = true // implicitly at least
+	tw.wroteHeader = true
 	if tw.timedOut {
 		return 0, ErrHandlerTimeout
 	}
