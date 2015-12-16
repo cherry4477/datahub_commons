@@ -3,7 +3,7 @@ package message
 import (
 	"encoding/json"
 	"errors"
-	"time"
+	//"time"
 	
 	"github.com/asiainfoLDP/datahub_commons/mq"
 )
@@ -15,8 +15,11 @@ type Message struct {
 	Type     string      `json:"type,omitempty"`
 	Receiver string      `json:"receiver,omitempty"`
 	Sender   string      `json:"sender,omitempty"`
-	Time     time.Time   `json:"time,omitempty"`
 	Data     interface{} `json:"data,omitempty"`
+	//Time     time.Time   `json:"time,omitempty"` 
+		// this is time to insert message into table.
+		// if there are other times related to this messsage,
+		// pls put them in Data field.
 }
 
 func PushMessageToQueue(queue mq.MessageQueue, topic string, key []byte, message *Message) error {
