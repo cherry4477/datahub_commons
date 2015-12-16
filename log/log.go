@@ -120,7 +120,7 @@ func (logger *Logger) Warningf(format string, v ...interface{}) {
 	if logger.level > LevelWarning {
 		return
 	}
-	log.Print(now("WARNING"), caller(logger.name, 2), " [WARNING] ", fmt.Sprintf(format, v...))
+	log.Print(now("WARNING"), caller(logger.name, 2), fmt.Sprintf(format, v...))
 }
 
 func (logger *Logger) Error(v ...interface{}) {
