@@ -58,11 +58,7 @@ func NewLogger(name string) *Logger {
 }
 
 func NewLoggerWithLevel(name string, level int) *Logger {
-	return &Logger{name: buildLoggerName(name), level: level}
-}
-
-func buildLoggerName(name string) string {
-	return fmt.Sprintf("[%s] ", name)
+	return &Logger{name: name, level: level}
 }
 
 var defaultlLogger = NewLogger("")
@@ -72,7 +68,7 @@ func DefaultlLogger() *Logger {
 }
 
 func SetDefaultLoggerName(name string) {
-	defaultlLogger.name = buildLoggerName(name)
+	defaultlLogger.name = name
 }
 
 func SetDefaultLoggerLevel(level int) {
