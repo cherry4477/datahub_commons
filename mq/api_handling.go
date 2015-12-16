@@ -18,7 +18,7 @@ func (mq *KafukaMQ) EnableApiHandling(localServerPort int, consumeTopic string, 
 		// this message will be ignored
 		partition, offset2, err2 := mq.SendSyncMessage(arl.consumeTopic, []byte(""), []byte(""))		
 		if err2 != nil {
-			log.Warningf("EnableApiHandling error: %s", err.Error())
+			log.DefaultlLogger().Warningf("EnableApiHandling error: %s", err.Error())
 			return err
 		}
 		
@@ -27,7 +27,7 @@ func (mq *KafukaMQ) EnableApiHandling(localServerPort int, consumeTopic string, 
 		err = mq.SetMessageListener(arl.consumeTopic, arl.partition, offset2, arl)
 		
 		if err != nil {
-			log.Warningf("EnableApiHandling error: %s", err.Error())
+			log.DefaultlLogger().Warningf("EnableApiHandling error: %s", err.Error())
 			return err
 		}
 	}
@@ -69,18 +69,18 @@ func newApiRequestListener(mq MessageQueue, localServerPort int, consumeTopic st
 }
 
 func (listener *ApiRequestListener) OnMessage(topic string, partition int32, offset int64, key, value []byte) bool {
-	//log.Debugf("(%d) Message consuming key: %s, value %s", offset, string(key), string(value))
+	//log.DefaultlLogger().Debugf("(%d) Message consuming key: %s, value %s", offset, string(key), string(value))
 	if len(key) ==0 && len(value) == 0 {
 		return true // this is a message to create a topic, so it will be ignored
 	}
 	
 	mq_request, err := DecodeRequest(value)
 	if mq_request == nil {
-		log.Errorf("bad message api request [%d]: %s", len(value), string(value))
+		log.DefaultlLogger().Errorf("bad message api request [%d]: %s", len(value), string(value))
 		return true
 	}
 	if err != nil {
-		log.Errorf("bad message api request [%d], error: %s\n%s\n", len(value), err.Error(), string(value))
+		log.DefaultlLogger().Errorf("bad message api request [%d], error: %s\n%s\n", len(value), err.Error(), string(value))
 		return true
 	}
 
@@ -88,7 +88,7 @@ func (listener *ApiRequestListener) OnMessage(topic string, partition int32, off
 	local_url := fmt.Sprintf("http://localhost:%d%s", listener.localServerPort, request.RequestURI)
 	request.URL, err = url.Parse(local_url)
 	if err != nil {
-		log.Errorf("local url (%s) parse error: %s", local_url, err.Error())
+		log.DefaultlLogger().Errorf("local url (%s) parse error: %s", local_url, err.Error())
 		return true
 	}
 
@@ -112,7 +112,7 @@ func (listener *ApiRequestListener) OnMessage(topic string, partition int32, off
 	mq_response := newMqResponse(response, "", status_code, ResponseStatusMessages[status_code])
 	data, err := EncodeResponse(mq_response, mq_request.RequestID)
 	if err != nil {
-		log.Errorf("EncodeResponse error: %s", err.Error())
+		log.DefaultlLogger().Errorf("EncodeResponse error: %s", err.Error())
 		return true
 	}
 
@@ -122,6 +122,6 @@ func (listener *ApiRequestListener) OnMessage(topic string, partition int32, off
 }
 
 func (listener *ApiRequestListener) OnError(err error) bool {
-	log.Debugf("api request listener error: %s", err.Error())
+	log.DefaultlLogger().Debugf("api request listener error: %s", err.Error())
 	return false
 }

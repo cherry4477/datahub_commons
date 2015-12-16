@@ -20,7 +20,7 @@ func (mq *KafukaMQ) EnableApiCalling(consumeTopic string) error {
 		partition, offset2, err2 := mq.SendSyncMessage(apl.consumeTopic, []byte(""), []byte(""))
 		
 		if err2 != nil {
-			log.Warningf("EnableApiCalling error: %s", err.Error())
+			log.DefaultlLogger().Warningf("EnableApiCalling error: %s", err.Error())
 			return err
 		}
 		
@@ -28,7 +28,7 @@ func (mq *KafukaMQ) EnableApiCalling(consumeTopic string) error {
 		apl.partition = partition
 		err = mq.SetMessageListener(apl.consumeTopic, apl.partition, offset2, apl)
 		if err != nil {
-			log.Warningf("EnableApiCalling error: %s", err.Error())
+			log.DefaultlLogger().Warningf("EnableApiCalling error: %s", err.Error())
 			return err
 		}
 	}
@@ -87,7 +87,7 @@ func (mq *KafukaMQ) SyncApiRequest(sendTopic string, key []byte, req *http.Reque
 
 	select {
 	case <-time.After(7 * time.Second): // todo, use param instead
-		log.Warning("SyncApiRequest timeout")
+		log.DefaultlLogger().Warning("SyncApiRequest timeout")
 		err = errors.New("SyncApiRequest timeout")
 	case mq_response := <-mq_request.SyncedResponse:
 		if mq_response != nil {
@@ -101,7 +101,7 @@ func (mq *KafukaMQ) SyncApiRequest(sendTopic string, key []byte, req *http.Reque
 		}
 	}
 
-	log.Warning("SyncApiRequest response errror: ", err.Error())
+	log.DefaultlLogger().Warning("SyncApiRequest response errror: ", err.Error())
 
 	return nil, err
 }
@@ -136,26 +136,26 @@ func newApiResponseListener(consumeTopic string) *ApiResponseListener {
 }
 
 func (listener *ApiResponseListener) OnMessage(topic string, partition int32, offset int64, key, value []byte) bool {
-	//log.Debugf("(%d) Message consuming key: %s, value %s", offset, string(key), string(value))
+	//log.DefaultlLogger().Debugf("(%d) Message consuming key: %s, value %s", offset, string(key), string(value))
 	if len(key) ==0 && len(value) == 0 {
 		return true // this is a message to create a topic, so it will be ignored
 	}
 	
 	mq_response, mq_request, err := DecodeResponse(value, listener)
 	if err != nil {
-		log.Errorf("bad message api response, error: %s", err.Error())
+		log.DefaultlLogger().Errorf("bad message api response, error: %s", err.Error())
 		return true
 	}
 	if mq_response == nil {
-		log.Errorf("bad message api response (mq_response == null): %s", string(value))
+		log.DefaultlLogger().Errorf("bad message api response (mq_response == null): %s", string(value))
 		return true
 	}
 	if mq_request == nil {
-		log.Errorf("bad message api response (mq_request == null): %s", string(value))
+		log.DefaultlLogger().Errorf("bad message api response (mq_request == null): %s", string(value))
 		return true
 	}
 	if mq_request.SyncedResponse == nil {
-		log.Errorf("bad message api response (mq_request.SyncedResponse == nil): %s", string(value))
+		log.DefaultlLogger().Errorf("bad message api response (mq_request.SyncedResponse == nil): %s", string(value))
 		return true
 	}
 	
@@ -170,7 +170,7 @@ func (listener *ApiResponseListener) OnMessage(topic string, partition int32, of
 }
 
 func (listener *ApiResponseListener) OnError(err error) bool {
-	log.Debugf("api response listener error: %s", err.Error())
+	log.DefaultlLogger().Debugf("api response listener error: %s", err.Error())
 	return false
 }
 
@@ -207,10 +207,10 @@ func (listener *ApiResponseListener) removePendingRequest(mqRequest *MqRequest) 
 	r, ok := listener.pendingApiRequests[mqRequest.RequestID]
 	if ok {
 		if mqRequest != r {
-			log.Error("removePendingRequest error: mqRequest != r")
+			log.DefaultlLogger().Error("removePendingRequest error: mqRequest != r")
 		}
 		if mqRequest.SyncedResponse == nil {
-			log.Error("removePendingRequest error: mqRequest.SyncedResponse == nil")
+			log.DefaultlLogger().Error("removePendingRequest error: mqRequest.SyncedResponse == nil")
 		}
 
 		delete(listener.pendingApiRequests, mqRequest.RequestID)

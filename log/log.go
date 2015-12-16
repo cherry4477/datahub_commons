@@ -5,6 +5,7 @@ import (
 	"log"
 	"time"
 	//"os"
+	"strings"
 )
 
 const (
@@ -36,7 +37,7 @@ var mapLevelString2Int = map[string]int{
 }
 
 func LevelString2Int(str string) int {
-	level, ok := mapLevelString2Int[str]
+	level, ok := mapLevelString2Int[strings.ToLower(str)]
 	if ok {
 		return level
 	}
@@ -47,8 +48,8 @@ func LevelString2Int(str string) int {
 //===========================================
 
 type Logger struct {
-	Level int
-	Name  string
+	level int
+	name  string
 }
 
 func NewLogger(name string) *Logger {
@@ -56,7 +57,7 @@ func NewLogger(name string) *Logger {
 }
 
 func NewLoggerWithLevel(name string, level int) *Logger {
-	return &Logger{Name: buildLoggerName(name), Level: level}
+	return &Logger{name: buildLoggerName(name), level: level}
 }
 
 func buildLoggerName(name string) string {
@@ -65,88 +66,92 @@ func buildLoggerName(name string) string {
 
 var defaultlLogger = NewLogger("")
 
+func DefaultlLogger() *Logger {
+	return defaultlLogger
+}
+
 func SetDefaultLoggerName(name string) {
-	defaultlLogger.Name = buildLoggerName(name)
+	defaultlLogger.name = buildLoggerName(name)
 }
 
 func SetDefaultLoggerLevel(level int) {
-	defaultlLogger.Level = level
+	defaultlLogger.level = level
 }
 
 //===========================================
 
 func (logger *Logger) Debug(v ...interface{}) {
-	if logger.Level > LevelDebug {
+	if logger.level > LevelDebug {
 		return
 	}
-	log.Print(now("DEBUG"), logger.Name, fmt.Sprint(v...))
+	log.Print(now("DEBUG"), logger.name, fmt.Sprint(v...))
 }
 
 func (logger *Logger) Debugf(format string, v ...interface{}) {
-	if logger.Level > LevelDebug {
+	if logger.level > LevelDebug {
 		return
 	}
-	log.Print(now("DEBUG"), logger.Name, fmt.Sprintf(format, v...))
+	log.Print(now("DEBUG"), logger.name, fmt.Sprintf(format, v...))
 }
 
 func (logger *Logger) Info(v ...interface{}) {
-	if logger.Level > LevelInfo {
+	if logger.level > LevelInfo {
 		return
 	}
-	log.Print(now("INFO"), logger.Name, fmt.Sprint(v...))
+	log.Print(now("INFO"), logger.name, fmt.Sprint(v...))
 }
 
 func (logger *Logger) Infof(format string, v ...interface{}) {
-	if logger.Level > LevelInfo {
+	if logger.level > LevelInfo {
 		return
 	}
-	log.Print(now("INFO"), logger.Name, fmt.Sprintf(format, v...))
+	log.Print(now("INFO"), logger.name, fmt.Sprintf(format, v...))
 }
 
 func (logger *Logger) Warning(v ...interface{}) {
-	if logger.Level > LevelWarning {
+	if logger.level > LevelWarning {
 		return
 	}
-	log.Print(now("WARNING"), logger.Name, fmt.Sprint(v...))
+	log.Print(now("WARNING"), logger.name, fmt.Sprint(v...))
 }
 
 func (logger *Logger) Warningf(format string, v ...interface{}) {
-	if logger.Level > LevelWarning {
+	if logger.level > LevelWarning {
 		return
 	}
-	log.Print(now("WARNING"), logger.Name, " [WARNING] ", fmt.Sprintf(format, v...))
+	log.Print(now("WARNING"), logger.name, " [WARNING] ", fmt.Sprintf(format, v...))
 }
 
 func (logger *Logger) Error(v ...interface{}) {
-	if logger.Level > LevelError {
+	if logger.level > LevelError {
 		return
 	}
-	log.Print(now("ERROR"), logger.Name, fmt.Sprint(v...))
+	log.Print(now("ERROR"), logger.name, fmt.Sprint(v...))
 }
 
 func (logger *Logger) Errorf(format string, v ...interface{}) {
-	if logger.Level > LevelError {
+	if logger.level > LevelError {
 		return
 	}
-	log.Print(now("ERROR"), logger.Name, fmt.Sprintf(format, v...))
+	log.Print(now("ERROR"), logger.name, fmt.Sprintf(format, v...))
 }
 
 func (logger *Logger) Fatal(v ...interface{}) {
-	if logger.Level > LevelFatal {
+	if logger.level > LevelFatal {
 		return
 	}
-	log.Fatal(now("FATAL"), logger.Name, fmt.Sprint(v...))
+	log.Fatal(now("FATAL"), logger.name, fmt.Sprint(v...))
 }
 
 func (logger *Logger) Fatalf(format string, v ...interface{}) {
-	if logger.Level > LevelFatal {
+	if logger.level > LevelFatal {
 		return
 	}
-	log.Fatal(now("FATAL"), logger.Name, fmt.Sprintf(format, v...))
+	log.Fatal(now("FATAL"), logger.name, fmt.Sprintf(format, v...))
 }
 
 //======================================
-
+/*
 func Debug(v ...interface{}) {
 	defaultlLogger.Debug(v...)
 }
@@ -186,7 +191,7 @@ func Fatal(v ...interface{}) {
 func Fatalf(format string, v ...interface{}) {
 	defaultlLogger.Fatalf(format, v...)
 }
-
+*/
 //=====================================
 
 func now(level string) string {
