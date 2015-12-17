@@ -15,7 +15,7 @@ const (
 //
 //=============================================================
 
-func RemoteCallWithBody(method string, url string, token string, body []byte) (*http.Response, []byte, error) {
+func RemoteCallWithBody(method string, url string, token string, body []byte, contentType string) (*http.Response, []byte, error) {
 	var request *http.Request
 	var err error
 	if len(body) == 0 {
@@ -25,6 +25,9 @@ func RemoteCallWithBody(method string, url string, token string, body []byte) (*
 	}
 	if err != nil {
 		return nil, nil, err
+	}
+	if contentType != "" {
+		request.Header.Set("Content-Type", contentType)
 	}
 	if token != "" {
 		request.Header.Set("Authorization", token)
@@ -44,8 +47,12 @@ func RemoteCallWithBody(method string, url string, token string, body []byte) (*
 	return response, bytes, err
 }
 
+func RemoteCallWithJsonBody(method string, url string, token string, jsonBody []byte) (*http.Response, []byte, error) {
+	return RemoteCallWithBody(method, url, token, jsonBody, "application/json; charset=utf-8")
+}
+
 func RemoteCall(method string, url string, token string) (*http.Response, []byte, error) {
-	return RemoteCallWithBody(method, url, token, nil)
+	return RemoteCallWithBody(method, url, token, nil, "")
 }
 
 func GetRequestData(r *http.Request) ([]byte, error) {
