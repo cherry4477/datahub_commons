@@ -63,6 +63,7 @@ func NewLoggerWithLevel(name string, level int) *Logger {
 
 var defaultlLogger = NewLogger("")
 
+// todo: correct it to DefaultLogger
 func DefaultlLogger() *Logger {
 	return defaultlLogger
 }
