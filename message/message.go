@@ -44,3 +44,28 @@ func ParseJsonMessage(msgData []byte) (*Message, error) {
 
 	return msg, nil	
 }
+
+//=====================================
+// 
+//=====================================
+
+type Email struct {
+	To      string `json:"to"`
+	Subject string `json:"subject"`
+	Message string `json:"message"`
+	IsHTML  bool   `json:"ishtml"`
+}
+
+func ParseJsonEmail(msgData []byte) (*Email, error) {
+	if msgData == nil {
+		return nil, errors.New("message data can't be nil")
+	}
+
+	msg := &Email{}
+	err := json.Unmarshal(msgData, msg)
+	if err != nil {
+		return nil, err
+	}
+
+	return msg, nil	
+}
