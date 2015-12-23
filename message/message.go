@@ -17,7 +17,7 @@ type Message struct {
 	Sender   string      `json:"sender,omitempty"`
 	Data     interface{} `json:"data,omitempty"`
 	//Time     time.Time   `json:"time,omitempty"` 
-		// this is time to insert message into table.
+		// this is the time to insert message into table.
 		// if there are other times related to this messsage,
 		// pls put them in Data field.
 }
