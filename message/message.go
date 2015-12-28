@@ -23,14 +23,14 @@ type Message struct {
 		// pls put them in Data field.
 }
 
-func PushMessageToQueue(queue mq.MessageQueue, topic string, key []byte, message *Message) error {
+func PushMessageToQueue(queue mq.MessageQueue, mqTopic string, key []byte, message *Message) error {
 	json_bytes, err := json.Marshal(message)
 	if err != nil {
 		log.DefaultLogger().Warningf("PushMessageToQueue error: %s.\nMessage=%s", err.Error(), string(json_bytes))
 		return err
 	}
 	
-	return queue.SendAsyncMessage(topic, key, json_bytes)
+	return queue.SendAsyncMessage(mqTopic, key, json_bytes)
 }
 
 func ParseJsonMessage(msgData []byte) (*Message, error) {
@@ -71,3 +71,15 @@ func ParseJsonEmail(msgData []byte) (*Email, error) {
 
 	return msg, nil	
 }
+
+func PushMailToQueue(queue mq.MessageQueue, mqTopic string, key []byte, mail *Email) error {
+	json_bytes, err := json.Marshal(mail)
+	if err != nil {
+		log.DefaultLogger().Warningf("PushMailToQueue error: %s.\nEmail=%s", err.Error(), string(json_bytes))
+		return err
+	}
+	
+	return queue.SendAsyncMessage(mqTopic, key, json_bytes)
+}
+
+
