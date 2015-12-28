@@ -54,7 +54,7 @@ func ParseJsonMessage(msgData []byte) (*Message, error) {
 type Email struct {
 	To      string `json:"to"`
 	Subject string `json:"subject"`
-	Message string `json:"message"`
+	Content string `json:"content"`
 	IsHTML  bool   `json:"ishtml"`
 }
 
@@ -69,7 +69,7 @@ func ParseJsonEmail(msgData []byte) (*Email, error) {
 		return nil, err
 	}
 
-	return msg, nil	
+	return msg, nil
 }
 
 func PushMailToQueue(queue mq.MessageQueue, mqTopic string, key []byte, mail *Email) error {
