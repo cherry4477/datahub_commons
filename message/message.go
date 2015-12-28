@@ -6,6 +6,7 @@ import (
 	//"time"
 	
 	"github.com/asiainfoLDP/datahub_commons/mq"
+	"github.com/asiainfoLDP/datahub_commons/log"
 )
 
 // todo: maybe it is better to package the message push and save time in the header
@@ -25,6 +26,7 @@ type Message struct {
 func PushMessageToQueue(queue mq.MessageQueue, topic string, key []byte, message *Message) error {
 	json_bytes, err := json.Marshal(message)
 	if err != nil {
+		log.DefaultLogger().Warningf("PushMessageToQueue error: %s.\nMessage=%s", err.Error(), string(json_bytes))
 		return err
 	}
 	

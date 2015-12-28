@@ -22,6 +22,10 @@ func GetSubscriptionsStatKey(words ...string) string {
 	return fmt.Sprintf("%s%s%s", GetGeneralStatKey(words...), "#", "subs")
 }
 
+func GetSubscriptionPlanSigningTimesStatKey(words ...string) string { // params should be (repoName, itemName, planId string)
+	return fmt.Sprintf("%s%s%s", GetGeneralStatKey(words...), "#", "sgns")
+}
+
 func GetTransactionsStatKey(words ...string) string {
 	return fmt.Sprintf("%s%s%s", GetGeneralStatKey(words...), "#", "txns")
 }
@@ -38,6 +42,10 @@ func GetCommentsStatKey(words ...string) string {
 
 func GetUserItemStatKey(username string, itemStatKey string) string {
 	return fmt.Sprintf("%s$%s", username, itemStatKey)
+}
+
+func GetUserSubscriptionPlanSigningTimesStatKey(userName, repoName, itemName, planId string) string {
+	return GetUserItemStatKey(userName, GetSubscriptionPlanSigningTimesStatKey(repoName, itemName, planId))
 }
 
 // user stats
