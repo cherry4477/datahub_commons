@@ -61,6 +61,14 @@ func NewLoggerWithLevel(name string, level int) *Logger {
 	return &Logger{name: name, level: level}
 }
 
+func (l *Logger)Name() string {
+	return l.name
+}
+
+func (l *Logger)Level() int {
+	return l.level
+}
+
 var defaultlLogger = NewLogger("")
 
 // todo: remove this
