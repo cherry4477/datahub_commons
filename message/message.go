@@ -30,6 +30,10 @@ func PushMessageToQueue(queue mq.MessageQueue, mqTopic string, key []byte, messa
 		return err
 	}
 	
+	go func() {
+		log.DefaultLogger().Debugf("PushMessageToQueue succeeded. key=%s, Message=%s", key, string(json_bytes))
+	}()
+	
 	return queue.SendAsyncMessage(mqTopic, key, json_bytes)
 }
 
@@ -78,6 +82,10 @@ func PushMailToQueue(queue mq.MessageQueue, mqTopic string, key []byte, mail *Em
 		log.DefaultLogger().Warningf("PushMailToQueue error: %s.\nEmail=%s", err.Error(), string(json_bytes))
 		return err
 	}
+	
+	go func() {
+		log.DefaultLogger().Debugf("PushMailToQueue succeeded. Email=%s", string(json_bytes))
+	}()
 	
 	return queue.SendAsyncMessage(mqTopic, key, json_bytes)
 }

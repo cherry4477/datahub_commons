@@ -79,6 +79,14 @@ func GetDateTransactionsStatKey(date time.Time) string {
 //==========================================================
 
 func UpdateStat(db *sql.DB, key string, delta int) (int, error) {
+	return updateOrSetStat(db, key, delta, true)
+}
+
+func SetStat(db *sql.DB, key string, delta int) (int, error) {
+	return updateOrSetStat(db, key, delta, false)
+}
+
+func updateOrSetStat(db *sql.DB, key string, delta int, isUpdate bool) (int, error) {
 	sqlget := `select STAT_VALUE from DH_ITEM_STAT where STAT_KEY=?`
 
 	tx, err := db.Begin()
@@ -107,7 +115,11 @@ func UpdateStat(db *sql.DB, key string, delta int) (int, error) {
 			return 0, err
 		}
 	} else {
-		stat = stat + delta
+		if isUpdate {
+			stat = stat + delta
+		} else {
+			stat = delta
+		}
 
 		// needed?
 		//if stat < 0 {
@@ -141,6 +153,7 @@ func RetrieveStat(db *sql.DB, key string) (int, error) {
 	}
 }
 
+// todo: maybe it is better to do this in a txn
 func RemoveStat(db *sql.DB, key string) (int, error) {
 	num, err := RetrieveStat(db, key)
 	if err != nil {
