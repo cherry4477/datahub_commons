@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"time"
 	"bytes"
+	
+	"github.com/asiainfoLDP/datahub_commons/log"
 )
 
 const (
@@ -75,5 +77,10 @@ func ParseRequestJsonAsMap(r *http.Request) (map[string]interface{}, error) {
 		return nil, err
 	}
 	
-	return ParseJsonToMap(data)
+	m, err := ParseJsonToMap(data)
+	if err != nil {
+		log.DefaultLogger().Debugf("ParseJsonToMap r.Body error: %s", err.Error())
+	}
+	
+	return m, err
 }

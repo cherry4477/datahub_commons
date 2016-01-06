@@ -26,15 +26,22 @@ type Message struct {
 func PushMessageToQueue(queue mq.MessageQueue, mqTopic string, key []byte, message *Message) error {
 	json_bytes, err := json.Marshal(message)
 	if err != nil {
-		log.DefaultLogger().Warningf("PushMessageToQueue error: %s.\nMessage=%s", err.Error(), string(json_bytes))
+		log.DefaultLogger().Warningf("PushMessageToQueue Marshal error: %s.\nMessage=%s", err.Error(), string(json_bytes))
 		return err
 	}
 	
-	go func() {
-		log.DefaultLogger().Debugf("PushMessageToQueue succeeded. key=%s, Message=%s", key, string(json_bytes))
-	}()
+	err = queue.SendAsyncMessage(mqTopic, key, json_bytes)
+	if err != nil {
+		go func() {
+			log.DefaultLogger().Warningf("PushMessageToQueue SendAsyncMessage error: %s.\nMessage=%s", err.Error(), string(json_bytes))
+		}()
+	} else {
+		go func() {
+			log.DefaultLogger().Debugf("PushMessageToQueue succeeded. key=%s, Message=%s", key, string(json_bytes))
+		}()
+	}
 	
-	return queue.SendAsyncMessage(mqTopic, key, json_bytes)
+	return err
 }
 
 func ParseJsonMessage(msgData []byte) (*Message, error) {
@@ -79,15 +86,22 @@ func ParseJsonEmail(msgData []byte) (*Email, error) {
 func PushMailToQueue(queue mq.MessageQueue, mqTopic string, key []byte, mail *Email) error {
 	json_bytes, err := json.Marshal(mail)
 	if err != nil {
-		log.DefaultLogger().Warningf("PushMailToQueue error: %s.\nEmail=%s", err.Error(), string(json_bytes))
+		log.DefaultLogger().Warningf("PushMailToQueue Marshal error: %s.\nEmail=%s", err.Error(), string(json_bytes))
 		return err
 	}
 	
-	go func() {
-		log.DefaultLogger().Debugf("PushMailToQueue succeeded. Email=%s", string(json_bytes))
-	}()
+	err = queue.SendAsyncMessage(mqTopic, key, json_bytes)
+	if err != nil {
+		go func() {
+			log.DefaultLogger().Warningf("PushMailToQueue SendAsyncMessage error: %s.\nEmail=%s", err.Error(), string(json_bytes))
+		}()
+	} else {
+		go func() {
+			log.DefaultLogger().Debugf("PushMailToQueue succeeded. Email=%s", string(json_bytes))
+		}()
+	}
 	
-	return queue.SendAsyncMessage(mqTopic, key, json_bytes)
+	return err
 }
 
 
