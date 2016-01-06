@@ -79,7 +79,7 @@ func ParseRequestJsonAsMap(r *http.Request) (map[string]interface{}, error) {
 	
 	m, err := ParseJsonToMap(data)
 	if err != nil {
-		log.DefaultLogger().Debugf("ParseJsonToMap r.Body error: %s", err.Error())
+		log.DefaultLogger().Debugf("ParseJsonToMap r.Body (%s) error: %s", string(data), err.Error())
 	}
 	
 	return m, err
