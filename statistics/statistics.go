@@ -18,11 +18,11 @@ func GetGeneralStatKey(words ...string) string {
 	return strings.Join(words, "/")
 }
 
-func GetSubscriptionsStatKey(words ...string) string {
+func GetStatsStatKey(words ...string) string {
 	return fmt.Sprintf("%s%s%s", GetGeneralStatKey(words...), "#", "subs")
 }
 
-func GetSubscriptionPlanSigningTimesStatKey(words ...string) string { // params should be (repoName, itemName, planId string)
+func GetStatPlanSigningTimesStatKey(words ...string) string { // params should be (repoName, itemName, planId string)
 	return fmt.Sprintf("%s%s%s", GetGeneralStatKey(words...), "#", "sgns")
 }
 
@@ -44,13 +44,13 @@ func GetUserItemStatKey(username string, itemStatKey string) string {
 	return fmt.Sprintf("%s$%s", username, itemStatKey)
 }
 
-func GetUserSubscriptionPlanSigningTimesStatKey(userName, repoName, itemName, planId string) string {
-	return GetUserItemStatKey(userName, GetSubscriptionPlanSigningTimesStatKey(repoName, itemName, planId))
+func GetUserStatPlanSigningTimesStatKey(userName, repoName, itemName, planId string) string {
+	return GetUserItemStatKey(userName, GetStatPlanSigningTimesStatKey(repoName, itemName, planId))
 }
 
 // user stats
 /*
-func GetUserSubscriptionsStatKey(username string) string {
+func GetUserStatsStatKey(username string) string {
 	return fmt.Sprintf("%s$#%s", username, "subs")
 }
 
@@ -67,7 +67,7 @@ func GetUserCommentsStatKey(username string) string {
 }
 */
 
-func GetDateSubscriptionsStatKey(date time.Time) string {
+func GetDateStatsStatKey(date time.Time) string {
 	return fmt.Sprintf("%s>%s", date.Format("2006-01-02"), "subs")
 }
 func GetDateTransactionsStatKey(date time.Time) string {
@@ -173,4 +173,48 @@ func RemoveStat(db *sql.DB, key string) (int, error) {
 	default:
 		return num, nil
 	}
+}
+
+//=======================================================================
+// cursor for outer package using
+//=======================================================================
+
+type StatCursor struct {
+	rows *sql.Rows
+}
+
+func newStatCursor(db *sql.DB) (*StatCursor, error) {
+	rows, err := db.Query(`select STAT_KEY, STAT_VALUE from DH_ITEM_STAT`)
+	if err != nil {
+		return nil, err
+	}
+
+	return &StatCursor{rows: rows}, nil
+}
+
+func (cursor *StatCursor) Close() {
+	if cursor.rows != nil {
+		cursor.rows.Close()
+		cursor.rows = nil
+	}
+}
+
+func (cursor *StatCursor) Next() (string, string, error) {
+	if cursor.rows != nil {
+		if cursor.rows.Next() {
+			key, value := "", ""
+			if err := cursor.rows.Scan(&key, value); err != nil {
+				return "", "", err
+			}
+			return key, value, nil
+		}
+
+		if err := cursor.rows.Err(); err != nil {
+			return "", "", err
+		}
+
+		cursor.Close()
+	}
+
+	return "", "", nil
 }
