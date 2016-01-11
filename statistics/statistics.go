@@ -236,7 +236,7 @@ func (cursor *StatCursor) Next() (string, int, error) {
 		if cursor.rows.Next() {
 			key := ""
 			value := 0
-			if err := cursor.rows.Scan(&key, value); err != nil {
+			if err := cursor.rows.Scan(&key, &value); err != nil {
 				return "", 0, err
 			}
 			return key, value, nil
