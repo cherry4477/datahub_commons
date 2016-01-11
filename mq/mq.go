@@ -7,7 +7,9 @@ import (
 	"log"
 	"os"
 
-	"github.com/Shopify/sarama"
+	//"github.com/Shopify/sarama"
+	"github.com/yaxinlx/sarama"
+	
 	//"github.com/wvanbergen/kafka/consumergroup"
 	//"github.com/wvanbergen/kazoo-go"
 
