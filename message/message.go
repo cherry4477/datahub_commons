@@ -31,14 +31,15 @@ func PushMessageToQueue(queue mq.MessageQueue, mqTopic string, key []byte, messa
 	}
 	
 	//err = queue.SendAsyncMessage(mqTopic, key, json_bytes)
-	_, _, err = queue.SendSyncMessage(mqTopic, key, json_bytes)
+	partition, offset, err := queue.SendSyncMessage(mqTopic, key, json_bytes)
 	if err != nil {
 		go func() {
 			log.DefaultLogger().Warningf("PushMessageToQueue SendAsyncMessage error: %s.\nMessage=%s", err.Error(), string(json_bytes))
 		}()
 	} else {
 		go func() {
-			log.DefaultLogger().Debugf("PushMessageToQueue succeeded. key=%s, Message=%s", key, string(json_bytes))
+			//log.DefaultLogger().Debugf("PushMessageToQueue succeeded. key=%s, Message=%s", key, string(json_bytes))
+			log.DefaultLogger().Debugf("PushMessageToQueue succeeded. partition=%d, offset=%d, key=%s, Message=%s", partition, offset, key, string(json_bytes))
 		}()
 	}
 	
