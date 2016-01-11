@@ -4,12 +4,14 @@ import (
 	"errors"
 	"fmt"
 	"sync"
-
-	//"github.com/asiainfoLDP/datahub_commons/log"
+	"log"
+	"os"
 
 	"github.com/Shopify/sarama"
 	//"github.com/wvanbergen/kafka/consumergroup"
 	//"github.com/wvanbergen/kazoo-go"
+
+	logger "github.com/asiainfoLDP/datahub_commons/log"
 )
 
 const (
@@ -156,6 +158,15 @@ func NewMQ(brokerList []string /*, zookeepers string*/ /*, c *Config*/) (Message
 	mq.activeConsumers = make(map[string]*KafukaComsumer)
 
 	//go mq.run()
+	
+	go func() {
+		sarama.Logger = log.New(os.Stdout, "[sarama] ", log.LstdFlags)
+		
+		for err := range mq.asyncProducer.Errors() {
+			logger.DefaultLogger().Warningf("mq.syncProducer err: %s", err.Error())
+		}
+	}()
+	
 
 	return mq, nil
 }
