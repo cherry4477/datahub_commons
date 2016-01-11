@@ -78,6 +78,36 @@ func GetDateTransactionsStatKey(date time.Time) string {
 //
 //==========================================================
 
+func ParseStatKey(statKey string) (date, user string, itemKeys []string, statName string) {
+	index3 := strings.LastIndexByte(statKey, '#')
+	if index3 < 0 {
+		index3 = strings.LastIndexByte(statKey, '>')
+		if index3 >= 0 {
+			date = statKey[:index3]
+			statName = statKey[index3+1:]
+		}
+	} else {
+		statName = statKey[index3+1:]
+		index1 := strings.IndexByte(statKey, '$')
+		if index1 >= 0 && index1 < index3 {
+			user = statKey[:index1]
+			itemKeys = strings.Split(statKey[index1+1:index3], "/")
+		} else {
+			itemKeys = strings.Split(statKey[:index3], "/")
+		}
+		
+		if len(itemKeys) == 1 && itemKeys[0] == "" {
+			itemKeys = nil
+		}
+	}
+	
+	return
+}
+
+//==========================================================
+//
+//==========================================================
+
 func UpdateStat(db *sql.DB, key string, delta int) (int, error) {
 	return updateOrSetStat(db, key, delta, true)
 }
@@ -199,22 +229,23 @@ func (cursor *StatCursor) Close() {
 	}
 }
 
-func (cursor *StatCursor) Next() (string, string, error) {
+func (cursor *StatCursor) Next() (string, int, error) {
 	if cursor.rows != nil {
 		if cursor.rows.Next() {
-			key, value := "", ""
+			key := ""
+			value := 0
 			if err := cursor.rows.Scan(&key, value); err != nil {
-				return "", "", err
+				return "", 0, err
 			}
 			return key, value, nil
 		}
 
 		if err := cursor.rows.Err(); err != nil {
-			return "", "", err
+			return "", 0, err
 		}
 
 		cursor.Close()
 	}
 
-	return "", "", nil
+	return "", 0, nil
 }
