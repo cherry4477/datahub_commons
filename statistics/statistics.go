@@ -18,11 +18,11 @@ func GetGeneralStatKey(words ...string) string {
 	return strings.Join(words, "/")
 }
 
-func GetStatsStatKey(words ...string) string {
+func GetSubscriptionsStatKey(words ...string) string {
 	return fmt.Sprintf("%s%s%s", GetGeneralStatKey(words...), "#", "subs")
 }
 
-func GetStatPlanSigningTimesStatKey(words ...string) string { // params should be (repoName, itemName, planId string)
+func GetSubscriptionPlanSigningTimesStatKey(words ...string) string { // params should be (repoName, itemName, planId string)
 	return fmt.Sprintf("%s%s%s", GetGeneralStatKey(words...), "#", "sgns")
 }
 
@@ -44,8 +44,8 @@ func GetUserItemStatKey(username string, itemStatKey string) string {
 	return fmt.Sprintf("%s$%s", username, itemStatKey)
 }
 
-func GetUserStatPlanSigningTimesStatKey(userName, repoName, itemName, planId string) string {
-	return GetUserItemStatKey(userName, GetStatPlanSigningTimesStatKey(repoName, itemName, planId))
+func GetUserSubscriptionPlanSigningTimesStatKey(userName, repoName, itemName, planId string) string {
+	return GetUserItemStatKey(userName, GetSubscriptionPlanSigningTimesStatKey(repoName, itemName, planId))
 }
 
 // user stats
@@ -215,7 +215,7 @@ type StatCursor struct {
 	rows *sql.Rows
 }
 
-func newStatCursor(db *sql.DB) (*StatCursor, error) {
+func GetStatCursor(db *sql.DB) (*StatCursor, error) {
 	rows, err := db.Query(`select STAT_KEY, STAT_VALUE from DH_ITEM_STAT`)
 	if err != nil {
 		return nil, err
