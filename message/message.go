@@ -30,7 +30,8 @@ func PushMessageToQueue(queue mq.MessageQueue, mqTopic string, key []byte, messa
 		return err
 	}
 	
-	err = queue.SendAsyncMessage(mqTopic, key, json_bytes)
+	//err = queue.SendAsyncMessage(mqTopic, key, json_bytes)
+	_, _, err = queue.SendSyncMessage(mqTopic, key, json_bytes)
 	if err != nil {
 		go func() {
 			log.DefaultLogger().Warningf("PushMessageToQueue SendAsyncMessage error: %s.\nMessage=%s", err.Error(), string(json_bytes))
