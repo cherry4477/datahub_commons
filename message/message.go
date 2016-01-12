@@ -16,6 +16,7 @@ type Message struct {
 	Type     string      `json:"type,omitempty"`
 	Receiver string      `json:"receiver,omitempty"`
 	Sender   string      `json:"sender,omitempty"`
+	Level    int         `json:"level,omitempty"`
 	Data     interface{} `json:"data,omitempty"`
 	//Time     time.Time   `json:"time,omitempty"` 
 		// this is the time to insert message into table.
