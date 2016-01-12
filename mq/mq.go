@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"sync"
-	"log"
-	"os"
+	//"log"
+	//"os"
 
 	//"github.com/Shopify/sarama"
 	"github.com/yaxinlx/sarama"
@@ -162,7 +162,7 @@ func NewMQ(brokerList []string /*, zookeepers string*/ /*, c *Config*/) (Message
 	//go mq.run()
 	
 	go func() {
-		sarama.Logger = log.New(os.Stdout, "[sarama] ", log.LstdFlags)
+		//sarama.Logger = log.New(os.Stdout, "[sarama] ", log.LstdFlags)
 		
 		for err := range mq.asyncProducer.Errors() {
 			logger.DefaultLogger().Warningf("mq.syncProducer err: %s", err.Error())
