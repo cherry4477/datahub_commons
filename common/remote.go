@@ -18,6 +18,8 @@ const (
 //=============================================================
 
 func RemoteCallWithBody(method string, url string, token string, body []byte, contentType string) (*http.Response, []byte, error) {
+	log.DefaultLogger().Debugf("method: %s, url: %s, token: %s, contentType: %s, body: %s", method, url, token, contentType, string(body))
+	
 	var request *http.Request
 	var err error
 	if len(body) == 0 {
