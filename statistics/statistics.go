@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
-	"time"
+	//"time"
 )
 
 /*
@@ -13,6 +13,16 @@ The fact of arbitrary chars in tag may be a problem for stat key.
 This may make some tag stat keys are duplicated with some user stat key.
 So it is best to avoid $#& in tag name.
 */
+
+// todo: move following GetXxxKey functions into individual projects
+
+func GetVersionKey(words ...string) string {
+	return fmt.Sprintf("%s%s%s", GetGeneralStatKey(words...), "#", "version")
+}
+
+func GetPhaseKey(words ...string) string {
+	return fmt.Sprintf("%s%s%s", GetGeneralStatKey(words...), "#", "phase")
+}
 
 func GetGeneralStatKey(words ...string) string {
 	return strings.Join(words, "/")
@@ -68,13 +78,13 @@ func GetUserCommentsStatKey(username string) string {
 */
 
 // the following 2 will be removed
-
-func GetDateStatsStatKey(date time.Time) string {
-	return fmt.Sprintf("%s>%s", date.Format("2006-01-02"), "subs")
-}
-func GetDateTransactionsStatKey(date time.Time) string {
-	return fmt.Sprintf("%s>%s", date.Format("2006-01-02"), "txns")
-}
+// it should be >$#
+//func GetDateStatsStatKey(date time.Time) string {
+//	return fmt.Sprintf("%s>%s", date.Format("2006-01-02"), "subs")
+//}
+//func GetDateTransactionsStatKey(date time.Time) string {
+//	return fmt.Sprintf("%s>%s", date.Format("2006-01-02"), "txns")
+//}
 
 //==========================================================
 //
@@ -111,14 +121,20 @@ func ParseStatKey(statKey string) (date, user string, itemKeys []string, statNam
 //==========================================================
 
 func UpdateStat(db *sql.DB, key string, delta int) (int, error) {
-	return updateOrSetStat(db, key, delta, true)
+	return updateOrSetStat(db, key, delta, -1, true)
 }
 
-func SetStat(db *sql.DB, key string, delta int) (int, error) {
-	return updateOrSetStat(db, key, delta, false)
+func SetStat(db *sql.DB, key string, newStat int) (int, error) {
+	return updateOrSetStat(db, key, newStat, -1, false)
 }
 
-func updateOrSetStat(db *sql.DB, key string, delta int, isUpdate bool) (int, error) {
+func SetStatIf(db *sql.DB, key string, newStat, ifOldStat int) (int, error) {
+	return updateOrSetStat(db, key, newStat, ifOldStat, false)
+}
+
+// isUpdate == false means set 
+// ifOldStat is for table upgrade
+func updateOrSetStat(db *sql.DB, key string, delta, ifOldStat int, isUpdate bool) (int, error) {
 	sqlget := `select STAT_VALUE from DH_ITEM_STAT where STAT_KEY=?`
 
 	tx, err := db.Begin()
@@ -133,7 +149,15 @@ func updateOrSetStat(db *sql.DB, key string, delta int, isUpdate bool) (int, err
 			tx.Rollback()
 			return 0, err
 		}
-
+		
+		// only for update if not exist
+		if isUpdate {
+			if ifOldStat >= 0 && ifOldStat != 0 {
+				tx.Rollback()
+				return 0, fmt.Errorf("ifOldStat (%d) != 0", ifOldStat)
+			}
+		}
+		
 		stat = delta
 		if stat <= 0 {
 			tx.Rollback()
@@ -147,6 +171,11 @@ func updateOrSetStat(db *sql.DB, key string, delta int, isUpdate bool) (int, err
 			return 0, err
 		}
 	} else {
+		if ifOldStat >= 0 && ifOldStat != stat {
+			tx.Rollback()
+			return stat, fmt.Errorf("ifOldStat (%d) != stat (%d)", ifOldStat, stat)
+		}
+		
 		if isUpdate {
 			stat = stat + delta
 		} else {
