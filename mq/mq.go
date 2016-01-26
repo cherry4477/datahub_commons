@@ -100,6 +100,7 @@ func (consumer *KafukaComsumer) willClose() bool {
 	return consumer.toClose
 }
 
+// todo: rename -> KafkaMQ
 type KafukaMQ struct {
 	client        sarama.Client
 	offsetManager sarama.OffsetManager
@@ -168,10 +169,13 @@ func NewMQ(brokerList []string /*, zookeepers string*/ /*, c *Config*/) (Message
 			logger.DefaultLogger().Warningf("mq.syncProducer err: %s", err.Error())
 		}
 	}()
-	
 
 	return mq, nil
 }
+
+//func (mq *KafukaMq) Connected() {
+//	if mq.client == nil || mq.client.
+//}
 
 //func (mq *KafukaMQ) run() {
 //
