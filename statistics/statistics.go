@@ -59,8 +59,7 @@ func GetUserSubscriptionPlanSigningTimesStatKey(userName, repoName, itemName, pl
 }
 
 // user stats
-/*
-func GetUserStatsStatKey(username string) string {
+func GetUserSubscriptionsStatKey(username string) string {
 	return fmt.Sprintf("%s$#%s", username, "subs")
 }
 
@@ -75,7 +74,6 @@ func GetUserStarsStatKey(username string) string {
 func GetUserCommentsStatKey(username string) string {
 	return fmt.Sprintf("%s$#%s", username, "cmts")
 }
-*/
 
 // the following 2 will be removed
 // it should be >$#
