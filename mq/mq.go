@@ -308,6 +308,11 @@ func (mq *KafukaMQ) SendSyncMessage(topic string, key, message []byte) (int32, i
 	if mq.syncProducer == nil {
 		return -1, -1, errors.New("mq.syncProducer == nil")
 	}
+
+	defer func() {
+		recover()
+	}()
+
 	return mq.syncProducer.SendMessage(&sarama.ProducerMessage{
 		Topic: topic,
 		Key:   sarama.ByteEncoder(key),
@@ -319,6 +324,11 @@ func (mq *KafukaMQ) SendAsyncMessage(topic string, key, message []byte) error {
 	if mq.asyncProducer == nil {
 		return errors.New("mq.asyncProducer == nil")
 	}
+
+	defer func() {
+		recover()
+	}()
+
 	mq.asyncProducer.Input() <- &sarama.ProducerMessage{
 		Topic: topic,
 		Key:   sarama.ByteEncoder(key),
