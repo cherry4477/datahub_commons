@@ -157,7 +157,7 @@ func updateOrSetStat(db *sql.DB, key string, delta, ifOldStat int, isUpdate bool
 		}
 		
 		stat = delta
-		if stat <= 0 {
+		if stat < 0 {
 			tx.Rollback()
 			return 0, errors.New("stat delta can't be <= 0")
 		}
