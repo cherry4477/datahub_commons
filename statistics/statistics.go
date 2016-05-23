@@ -130,8 +130,11 @@ func SetStatIf(db *sql.DB, key string, newStat, ifOldStat int) (int, error) {
 	return updateOrSetStat(db, key, newStat, ifOldStat, false)
 }
 
-// isUpdate == false means set 
-// ifOldStat is for table upgrade
+var ErrOldStatNotMatch = errors.New("old stat not match")
+
+// isUpdate == false means replace
+// ifOldStat is only valid when it is >= 0s
+// if old stat doesn't match ifOldStat, the old stat and error will be returned
 func updateOrSetStat(db *sql.DB, key string, delta, ifOldStat int, isUpdate bool) (int, error) {
 	sqlget := `select STAT_VALUE from DH_ITEM_STAT where STAT_KEY=?`
 
@@ -152,7 +155,7 @@ func updateOrSetStat(db *sql.DB, key string, delta, ifOldStat int, isUpdate bool
 		if isUpdate {
 			if ifOldStat >= 0 && ifOldStat != 0 {
 				tx.Rollback()
-				return 0, fmt.Errorf("ifOldStat (%d) != 0", ifOldStat)
+				return stat, ErrOldStatNotMatch // fmt.Errorf("ifOldStat (%d) != 0", ifOldStat)
 			}
 		}
 		
@@ -171,7 +174,7 @@ func updateOrSetStat(db *sql.DB, key string, delta, ifOldStat int, isUpdate bool
 	} else {
 		if ifOldStat >= 0 && ifOldStat != stat {
 			tx.Rollback()
-			return stat, fmt.Errorf("ifOldStat (%d) != stat (%d)", ifOldStat, stat)
+			return stat, ErrOldStatNotMatch // fmt.Errorf("ifOldStat (%d) != stat (%d)", ifOldStat, stat)
 		}
 		
 		if isUpdate {
