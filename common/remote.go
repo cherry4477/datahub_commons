@@ -17,7 +17,7 @@ const (
 //
 //=============================================================
 
-func RemoteCallWithBody(method string, url string, token string, body []byte, contentType string) (*http.Response, []byte, error) {
+func RemoteCallWithBody(method, url string, token, user string, body []byte, contentType string) (*http.Response, []byte, error) {
 	log.DefaultLogger().Debugf("method: %s, url: %s, token: %s, contentType: %s, body: %s", method, url, token, contentType, string(body))
 	
 	var request *http.Request
@@ -36,6 +36,9 @@ func RemoteCallWithBody(method string, url string, token string, body []byte, co
 	if token != "" {
 		request.Header.Set("Authorization", token)
 	}
+	if user != "" {
+		request.Header.Set("User", user)
+	}
 	client := &http.Client{
 		Timeout: time.Duration(GeneralRemoteCallTimeout) * time.Second,
 	}
@@ -51,12 +54,12 @@ func RemoteCallWithBody(method string, url string, token string, body []byte, co
 	return response, bytes, err
 }
 
-func RemoteCallWithJsonBody(method string, url string, token string, jsonBody []byte) (*http.Response, []byte, error) {
-	return RemoteCallWithBody(method, url, token, jsonBody, "application/json; charset=utf-8")
+func RemoteCallWithJsonBody(method string, url string, token, user string, jsonBody []byte) (*http.Response, []byte, error) {
+	return RemoteCallWithBody(method, url, token, user, jsonBody, "application/json; charset=utf-8")
 }
 
-func RemoteCall(method string, url string, token string) (*http.Response, []byte, error) {
-	return RemoteCallWithBody(method, url, token, nil, "")
+func RemoteCall(method string, url string, token, user string) (*http.Response, []byte, error) {
+	return RemoteCallWithBody(method, url, token, user, nil, "")
 }
 
 func GetRequestData(r *http.Request) ([]byte, error) {
