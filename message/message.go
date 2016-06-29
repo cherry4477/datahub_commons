@@ -93,13 +93,14 @@ func PushMailToQueue(queue mq.MessageQueue, mqTopic string, key []byte, mail *Em
 		return err
 	}
 	
-	err = queue.SendAsyncMessage(mqTopic, key, json_bytes)
+	_, _, err = queue.SendSyncMessage(mqTopic, key, json_bytes)
 	if err != nil {
 		go func() {
 			log.DefaultLogger().Warningf("PushMailToQueue SendAsyncMessage error: %s.\nEmail=%s", err.Error(), string(json_bytes))
 		}()
 	} else {
 		go func() {
+			//log.DefaultLogger().Debugf("PushMessageToQueue succeeded. key=%s, Message=%s", key, string(json_bytes))
 			log.DefaultLogger().Debugf("PushMailToQueue succeeded. Email=%s", string(json_bytes))
 		}()
 	}
