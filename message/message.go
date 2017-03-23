@@ -67,6 +67,8 @@ func ParseJsonMessage(msgData []byte) (*Message, error) {
 
 type Email struct {
 	To      string `json:"to"`
+	Cc      string `json:"cc"`
+	Bcc     string `json:"bcc"`
 	Subject string `json:"subject"`
 	Content string `json:"content"`
 	IsHTML  bool   `json:"ishtml"`
